@@ -8,6 +8,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.luv2code.springdemo.entity.Customer;
 
@@ -27,14 +28,42 @@ public class CustomerDAOImpl implements CustomerDAO {
 		Session currentSession = sessionFactory.getCurrentSession();
 		
 		
-		//create a query
+		//create a query - sort by lastname
 		Query<Customer> theQuery = 
-				currentSession.createQuery("from Customer", Customer.class);
+				currentSession.createQuery("from Customer order by lastName",
+						Customer.class);
 		//execute query and get the result list
 		
 		List<Customer> customers = theQuery.getResultList();		
 		// TODO Auto-generated method stub
 		return customers;
+	}
+
+	@Override
+	public void saveCustomer(Customer theCustomer) {
+		// get the current hibernate sessopn
+		
+		Session currentSession = sessionFactory.getCurrentSession();
+		
+		// save the customer to the db
+		
+		currentSession.saveOrUpdate(theCustomer);
+		
+	}
+
+	@Override
+	@Transactional
+	public Customer getCustomer(int theId) {
+		
+		
+		//get current hibernate session
+		Session currentSession=sessionFactory.getCurrentSession();
+		
+		
+		// read object from db using the primary key (theId)
+		Customer tempCustomer=currentSession.get(Customer.class, theId);
+		
+		return tempCustomer;
 	}
 
 }
